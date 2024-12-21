@@ -1,0 +1,64 @@
+openapi: '3.0.3'
+info:
+  title: Tiny Bank API
+  version: '1.0'
+servers:
+  - url: http://localhost:8080
+paths:
+  /users:
+    get:
+      responses:
+        '200':
+          description: OK
+    post:
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+  /users/{user-id}:
+    patch:
+      responses:
+        '204':
+          description: No Content
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+    get: 
+      responses: 
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+  /accounts:
+    get:
+      responses:
+        '200':
+          description: OK
+    post:
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+  /accounts/{account-id}:
+    get: 
+      responses: 
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+  /accounts/{account-id}/transactions:
+    get: 
+      responses: 
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+    post: 
+      responses: 
+        '200':
+          description: OK
+        '400':
+          description: Bad Request

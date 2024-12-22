@@ -60,7 +60,8 @@ public class UsersResource {
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     public Response search(@Context UriInfo uriInfo, @QueryParam("username") String username, @QueryParam("limit") Integer limit, @QueryParam("cursor") String cursor) {
-        return Response.ok(toListWebResponse(searchUsers.execute(new UserSearchQuery(username, limit, cursor)), uriInfo.getBaseUri())).build();
+        UserSearchQuery query = new UserSearchQuery(username, limit, cursor);
+        return Response.ok(toListWebResponse(searchUsers.execute(query), uriInfo.getBaseUri(), query)).build();
     }
 
     @GET
@@ -98,17 +99,23 @@ public class UsersResource {
         return new WebResponse<>(user, links);
     }
 
-    private ListWebResponse<WebResponse<User>> toListWebResponse(Search<User> search, URI baseUri) {
+    private ListWebResponse<WebResponse<User>> toListWebResponse(Search<User> search, URI baseUri, UserSearchQuery userSearchQuery) {
         Map<String, Link> links = new HashMap<>();
 
         String cursor = search.getCursor();
 
         if (cursor != null) {
+            UriBuilder builder = UriBuilder.fromUri(baseUri)
+                    .path("users")
+                    .queryParam("limit", search.getLimit())
+                    .queryParam("cursor", search.getCursor());
+
+            if(userSearchQuery.username() != null && !userSearchQuery.username().isEmpty()){
+                builder.queryParam("username", userSearchQuery.username());
+            }
+
             links.put("next",
-                    new Link(UriBuilder.fromUri(baseUri)
-                            .path("users")
-                            .queryParam("limit", search.getLimit())
-                            .queryParam("cursor", search.getCursor()).build().toString(), HttpMethod.GET ));
+                    new Link(builder.build().toString(), HttpMethod.GET ));
         }
 
         return new ListWebResponse<>(

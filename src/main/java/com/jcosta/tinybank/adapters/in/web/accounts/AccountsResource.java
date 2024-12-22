@@ -55,7 +55,8 @@ public class AccountsResource {
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     public Response search(@Context UriInfo uriInfo, @QueryParam("ownerId") String ownerId, @QueryParam("limit") Integer limit, @QueryParam("cursor") String cursor) {
-        return Response.ok(toListWebResponse(searchAccounts.execute(new AccountsSearchQuery(ownerId, limit, cursor)), uriInfo.getBaseUri())).build();
+        AccountsSearchQuery query = new AccountsSearchQuery(ownerId, limit, cursor);
+        return Response.ok(toListWebResponse(searchAccounts.execute(query), uriInfo.getBaseUri(), query)).build();
     }
 
     @GET
@@ -79,17 +80,24 @@ public class AccountsResource {
         return new WebResponse<>(account, links);
     }
 
-    private ListWebResponse<WebResponse<Account>> toListWebResponse(Search<Account> search, URI baseUri) {
+    private ListWebResponse<WebResponse<Account>> toListWebResponse(Search<Account> search, URI baseUri, AccountsSearchQuery query) {
         Map<String, Link> links = new HashMap<>();
 
         String cursor = search.getCursor();
 
         if (cursor != null) {
+            UriBuilder builder = UriBuilder.fromUri(baseUri)
+                    .path("accounts")
+                    .queryParam("limit", search.getLimit())
+                    .queryParam("cursor", search.getCursor());
+
+
+            if(query.ownerId() != null && !query.ownerId().isEmpty()) {
+                builder.queryParam("ownerId", query.ownerId());
+            }
+
             links.put("next",
-                    new Link(UriBuilder.fromUri(baseUri)
-                            .path("accounts")
-                            .queryParam("limit", search.getLimit())
-                            .queryParam("cursor", search.getCursor()).build().toString(), HttpMethod.GET ));
+                    new Link(builder.build().toString(), HttpMethod.GET));
         }
 
         return new ListWebResponse<>(

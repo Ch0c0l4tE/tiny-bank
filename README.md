@@ -43,9 +43,6 @@ as maintainability, scalability, flexibility, testability, etc.
 - Brief domain [here](./docs/domain.drawio.png)
 
 ## TODO
-[] users tests
-[] accounts tests
-[] transactions tests
 [] api spec
 [] epoch milis
 

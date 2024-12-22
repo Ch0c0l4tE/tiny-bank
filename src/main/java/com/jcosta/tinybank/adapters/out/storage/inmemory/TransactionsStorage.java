@@ -62,7 +62,7 @@ public class TransactionsStorage implements TransactionsDataService {
         List<Transaction> transactions  = db
                 .stream()
                 .filter(transaction -> {
-                    return accountId == null || transaction.source().equalsIgnoreCase(accountId) || transaction.target().equalsIgnoreCase(accountId);
+                    return accountId == null || accountId.equalsIgnoreCase(transaction.source()) || accountId.equalsIgnoreCase(transaction.target());
                 })
                 .skip(parsedCursor)
                 .limit(validLimit+1)

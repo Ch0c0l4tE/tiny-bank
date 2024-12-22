@@ -23,6 +23,9 @@ import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 
 import java.net.URI;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,7 +55,7 @@ public class TransactionsResource {
         return Response.ok(toListWebResponse(this.searchTransactions.execute(query), uriInfo.getBaseUri(), query)).build();
     }
 
-    private ListWebResponse<WebResponse<Transaction>> toListWebResponse(Search<Transaction> search, URI baseUri, SearchTransactionsQuery query) {
+    private ListWebResponse<WebResponse<TransactionDto>> toListWebResponse(Search<Transaction> search, URI baseUri, SearchTransactionsQuery query) {
         Map<String, Link> links = new HashMap<>();
 
         String cursor = search.getCursor();
@@ -76,7 +79,20 @@ public class TransactionsResource {
                 links);
     }
 
-    private WebResponse<Transaction> toWebResponse(Transaction transaction) {
-        return new WebResponse<>(transaction, null);
+    private WebResponse<TransactionDto> toWebResponse(Transaction transaction) {
+        return new WebResponse<>(
+                new TransactionDto(
+                        transaction.operationType(),
+                        transaction.target(),
+                        transaction.source(),
+                        transaction.amount(),
+                        convertEpochMillisToUtcLocalDateTime(transaction.epochMillis()).toString()),
+                null);
+    }
+
+    private LocalDateTime convertEpochMillisToUtcLocalDateTime(long epochMillis) {
+        return Instant.ofEpochMilli(epochMillis)
+                .atZone(ZoneOffset.UTC)
+                .toLocalDateTime();
     }
 }

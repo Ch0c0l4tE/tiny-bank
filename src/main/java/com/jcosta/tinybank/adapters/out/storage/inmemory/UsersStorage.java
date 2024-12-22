@@ -79,7 +79,7 @@ public class UsersStorage implements UserDataService {
             }
         }
 
-        boolean shouldIgnoreUsername = username == null || username.isEmpty();
+        boolean shouldIgnoreUsername = username == null;
 
         List<User> users  = usersDb
                 .entrySet()

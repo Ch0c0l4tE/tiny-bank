@@ -18,8 +18,8 @@ import static com.jcosta.tinybank.adapters.out.storage.inmemory.Crypto.decrypt;
 import static com.jcosta.tinybank.adapters.out.storage.inmemory.Crypto.encrypt;
 
 public class UsersStorage implements UserDataService {
-    private int MAX_LIMIT = 100;
-    private int DEFAULT_LIMIT = 100;
+    private final int MAX_LIMIT = 100;
+    private final int DEFAULT_LIMIT = 100;
     private static final ConcurrentHashMap<UUID, User> usersDb = new ConcurrentHashMap<>();
 
     @Override

@@ -65,8 +65,12 @@ Easily start your REST Web Services
 
 
 # Assumptions 
-Inactive users can be fetched by the Get by id method, but they dont appear on normal search 
-Search is using cursor pagination instead offset 
+- Inactive users can be fetched by the Get by id method, but they dont appear on normal search 
+- Search is using cursor pagination instead offset 
+- Its only possible to execute transactions within existing accounts - this means that operations to external accounts 
+that our system will be considered invalid, but the transaction resource is not tied to accounts by path to enable 
+the possibility of implementing this introducing the minimum of breaking changes. 
+
 
 # TODO
 [] users tests

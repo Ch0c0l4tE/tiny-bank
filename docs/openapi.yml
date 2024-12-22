@@ -67,7 +67,7 @@ paths:
           description: Not Found
         '500':
           description: Internal Server Error
-  /accounts/{account-id}/transactions:
+  /transactions:
     get: 
       responses: 
         '200':

@@ -1,5 +1,6 @@
 package com.jcosta.tinybank.adapters.in.web.filters;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.jcosta.tinybank.domain.exceptions.BusinessException;
 import com.jcosta.tinybank.domain.exceptions.DomainException;
 import com.jcosta.tinybank.domain.exceptions.ExceptionCode;
@@ -34,6 +35,17 @@ public class GlobalExceptionFilter implements ExceptionMapper<Exception> {
                                 getWebErrorType(ExceptionCode.OPERATION_NOT_ALLOWED),
                                 "the invoked method is not allowed",
                                 null)).build();
+            }
+
+            if (exception.getCause() != null && exception.getCause() instanceof JsonMappingException jsonMappingException &&
+                    jsonMappingException.getCause() != null && jsonMappingException.getCause() instanceof DomainException domainException) {
+                int statusCode = getWebErrorStatus(domainException.getCode());
+                LOG.infof("Status Code: " + statusCode , kv("problem", domainException));
+                return Response.status(statusCode).entity(
+                        new ErrorResponse(
+                                getWebErrorType(domainException.getCode()),
+                                domainException.getMessage(),
+                                domainException.getInvalidParams())).build();
             }
 
             return Response.fromResponse(originalErrorResponse)

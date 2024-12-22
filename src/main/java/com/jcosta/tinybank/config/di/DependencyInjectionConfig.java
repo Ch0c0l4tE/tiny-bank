@@ -17,9 +17,11 @@ import com.jcosta.tinybank.application.usecases.users.GetUserById;
 import com.jcosta.tinybank.application.usecases.users.PatchUser;
 import com.jcosta.tinybank.application.usecases.users.SearchUsers;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Singleton;
 import jakarta.ws.rs.Produces;
 
 public class DependencyInjectionConfig {
+
 
     // Adapters
     @Produces
@@ -85,8 +87,10 @@ public class DependencyInjectionConfig {
 
     @Produces
     @ApplicationScoped
-    CreateTransaction produceCreateTransaction(TransactionsDataService transactionsDataService) {
-        return new CreateTransaction(transactionsDataService);
+    CreateTransaction produceCreateTransaction(
+            TransactionsDataService transactionsDataService,
+            AccountsDataService accountsDataService) {
+        return new CreateTransaction(transactionsDataService, accountsDataService);
     }
 
     @Produces

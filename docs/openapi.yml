@@ -10,6 +10,8 @@ paths:
       responses:
         '200':
           description: OK
+        '500':
+          description: Internal Server Error
     post:
       responses:
         '200':
@@ -18,6 +20,8 @@ paths:
           description: Bad Request
         '409':
           description: Conflict
+        '500':
+          description: Internal Server Error
   /users/{user-id}:
     patch:
       responses:
@@ -27,17 +31,23 @@ paths:
           description: Not Modified
         '400':
           description: Bad Request
+        '500':
+          description: Internal Server Error
     get: 
       responses: 
         '200':
           description: OK
         '404':
           description: Not Found
+        '500':
+          description: Internal Server Error
   /accounts:
     get:
       responses:
         '200':
           description: OK
+        '500':
+          description: Internal Server Error
     post:
       responses:
         '200':
@@ -46,6 +56,8 @@ paths:
           description: Bad Request
         '409':
           description: Conflict
+        '500':
+          description: Internal Server Error
   /accounts/{account-id}:
     get: 
       responses: 
@@ -53,6 +65,8 @@ paths:
           description: OK
         '404':
           description: Not Found
+        '500':
+          description: Internal Server Error
   /accounts/{account-id}/transactions:
     get: 
       responses: 
@@ -60,9 +74,13 @@ paths:
           description: OK
         '404':
           description: Not Found
+        '500':
+          description: Internal Server Error
     post: 
       responses: 
         '200':
           description: OK
         '400':
           description: Bad Request
+        '500':
+          description: Internal Server Error

@@ -1,8 +1,9 @@
 package com.jcosta.tinybank.adapters.out.storage.inmemory;
 
-import com.jcosta.tinybank.application.port.UserDataService;
+import com.jcosta.tinybank.application.port.AccountsDataService;
 import com.jcosta.tinybank.domain.Search;
-import com.jcosta.tinybank.domain.exceptions.BusinessException;
+import com.jcosta.tinybank.domain.accounts.Account;
+import com.jcosta.tinybank.domain.accounts.AccountStatus;
 import com.jcosta.tinybank.domain.exceptions.DomainException;
 import com.jcosta.tinybank.domain.exceptions.ExceptionCode;
 import com.jcosta.tinybank.domain.exceptions.InvalidParam;
@@ -17,42 +18,42 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.jcosta.tinybank.adapters.out.storage.inmemory.Crypto.decrypt;
 import static com.jcosta.tinybank.adapters.out.storage.inmemory.Crypto.encrypt;
 
-public class UsersStorage implements UserDataService {
+public class AccountsStorage implements AccountsDataService {
     private int MAX_LIMIT = 100;
     private int DEFAULT_LIMIT = 100;
-    private static final ConcurrentHashMap<UUID, User> usersDb = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<UUID, Account> db = new ConcurrentHashMap<>();
 
     @Override
-    public User create(User user) {
+    public Account create(Account account) {
         UUID id = IdHelper.generate();
-        User userToCreate =  new User(id.toString(), user.username(), UserStatus.ACTIVE);
-        usersDb.put(id,userToCreate);
-        return userToCreate;
+        Account toCreate =  new Account(id.toString(), account.ownerId(), account.balance(), AccountStatus.ACTIVE);
+        db.put(id,toCreate);
+        return toCreate;
     }
 
     @Override
-    public User get(String id, boolean includeInactiveUsers) {
+    public Account get(String id, boolean includeInactive) {
         UUID recordId = IdHelper.generateFromString(id);
 
         if (recordId == null) {
-             return null;
-        }
-
-        User user =  usersDb.get(recordId);
-
-        if (user == null) {
             return null;
         }
 
-        if(!includeInactiveUsers && user.status().equals(UserStatus.INACTIVE)) {
+        Account existing =  db.get(recordId);
+
+        if (existing == null) {
             return null;
         }
 
-        return user;
+        if(!includeInactive && existing.status().equals(AccountStatus.INACTIVE)) {
+            return null;
+        }
+
+        return existing;
     }
 
     @Override
-    public Search<User> search(String username, Integer limit, String cursor, boolean includeInactive) {
+    public Search<Account> search(String ownerId, Integer limit, String cursor, boolean includeInactive) {
         int validLimit;
 
         if (limit == null) {
@@ -79,14 +80,14 @@ public class UsersStorage implements UserDataService {
             }
         }
 
-        boolean shouldIgnoreUsername = username == null || username.isEmpty();
+        boolean shouldIgnoreOwnerId = ownerId == null || ownerId.isEmpty();
 
-        List<User> users  = usersDb
+        List<Account> users  = db
                 .entrySet()
                 .stream()
                 .filter(userRecord -> {
-                    return (shouldIgnoreUsername || userRecord.getValue().username().equalsIgnoreCase(username)) &&
-                                    (includeInactive || userRecord.getValue().status().equals(UserStatus.ACTIVE));
+                    return (shouldIgnoreOwnerId || userRecord.getValue().ownerId().equalsIgnoreCase(ownerId)) &&
+                            (includeInactive || userRecord.getValue().status().equals(AccountStatus.ACTIVE));
                 })
                 .skip(parsedCursor)
                 .limit(validLimit+1)
@@ -104,14 +105,14 @@ public class UsersStorage implements UserDataService {
     }
 
     @Override
-    public boolean update(User user) {
-        UUID recordId = IdHelper.generateFromString(user.id());
+    public boolean update(Account account) {
+        UUID recordId = IdHelper.generateFromString(account.id());
 
-        if(recordId == null || !usersDb.containsKey(recordId)) {
+        if(recordId == null || !db.containsKey(recordId)) {
             return false;
         }
 
-        usersDb.replace(recordId, user);
+        db.replace(recordId, account);
         return true;
     }
 }

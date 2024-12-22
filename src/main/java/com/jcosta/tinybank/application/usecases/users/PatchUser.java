@@ -5,7 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jackson.jsonpointer.JsonPointer;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.jcosta.tinybank.application.port.AccountsDataService;
 import com.jcosta.tinybank.application.port.UserDataService;
+import com.jcosta.tinybank.domain.Search;
+import com.jcosta.tinybank.domain.accounts.Account;
+import com.jcosta.tinybank.domain.accounts.AccountStatus;
 import com.jcosta.tinybank.domain.exceptions.BusinessException;
 import com.jcosta.tinybank.domain.exceptions.DomainException;
 import com.jcosta.tinybank.domain.exceptions.ExceptionCode;
@@ -21,13 +25,16 @@ import java.util.stream.Collectors;
 
 public class PatchUser {
     private final UserDataService userDataService;
+    private final AccountsDataService accountsDataService;
     private final ObjectMapper objectMapper;
 
     public PatchUser(
             UserDataService userDataService,
+            AccountsDataService accountsDataService,
             ObjectMapper objectMapper
     ) {
         this.userDataService = userDataService;
+        this.accountsDataService = accountsDataService;
         this.objectMapper = objectMapper;
     }
 
@@ -51,6 +58,36 @@ public class PatchUser {
                     "Unable to process patch",
                     e);
         }
+
+        Search<Account> userAccounts = null;
+
+        AccountStatus status = AccountStatus.INACTIVE;
+        if(user.status().toString().equalsIgnoreCase(UserStatus.ACTIVE.toString())) {
+            status = AccountStatus.ACTIVE;
+        }
+
+        String cursor = null;
+        do{
+            userAccounts = this.accountsDataService.search(user.id(), 100, cursor, false);
+            if (userAccounts != null && userAccounts.getItems().size() > 0) {
+                for (Account account : userAccounts.getItems()) {
+                    if(!account.status().toString().equalsIgnoreCase(status.toString())) {
+                        this.accountsDataService.update(
+                                new Account(
+                                        account.id(),
+                                        account.ownerId(),
+                                        account.balance(),
+                                        status));
+                    }
+                }
+            }
+
+            if(userAccounts == null) {
+                cursor = null;
+            }else {
+                cursor = userAccounts.getCursor();
+            }
+        } while (cursor != null);
 
         return this.userDataService.update(user);
     }

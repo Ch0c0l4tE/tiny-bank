@@ -54,7 +54,7 @@ public class UsersResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response post(@Context UriInfo uriInfo, CreateUserRequest request) {
-        return Response.ok(toWebResponse(createUser.execute(request), uriInfo.getBaseUri())).build();
+        return Response.ok(toWebResponse(createUser.execute(request), uriInfo.getBaseUri(), false)).build();
     }
 
     @GET
@@ -67,7 +67,7 @@ public class UsersResource {
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response get(@Context UriInfo uriInfo, String id){
-        return Response.ok(toWebResponse(getUserById.execute(id), uriInfo.getBaseUri())).build();
+        return Response.ok(toWebResponse(getUserById.execute(id), uriInfo.getBaseUri(), false)).build();
     }
 
     @PATCH
@@ -79,8 +79,16 @@ public class UsersResource {
         return Response.noContent().build();
     }
 
-    private WebResponse<User> toWebResponse(User user, URI baseUri) {
+    private WebResponse<User> toWebResponse(User user, URI baseUri, boolean includeSelf) {
         Map<String, Link> links = new HashMap<>();
+
+        if (includeSelf) {
+            links.put("self",
+                    new Link(UriBuilder.fromUri(baseUri)
+                            .path("users")
+                            .path(user.id())
+                            .build().toString(), HttpMethod.GET));
+        }
 
         links.put("patch",
                 new Link(UriBuilder.fromUri(baseUri)
@@ -104,7 +112,7 @@ public class UsersResource {
         }
 
         return new ListWebResponse<>(
-                search.getItems().stream().map(user -> toWebResponse(user, baseUri)).toList(),
+                search.getItems().stream().map(user -> toWebResponse(user, baseUri, true)).toList(),
                 links);
     }
 }

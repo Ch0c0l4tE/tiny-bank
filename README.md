@@ -67,3 +67,12 @@ Easily start your REST Web Services
 # Assumptions 
 Inactive users can be fetched by the Get by id method, but they dont appear on normal search 
 Search is using cursor pagination instead offset 
+
+# TODO
+[] users tests
+[] accounts implementation and tests
+[] transactions implementation and tests
+[]api spec
+[]describe application arch
+[]prereqs to run 
+[] event bus on change user status 

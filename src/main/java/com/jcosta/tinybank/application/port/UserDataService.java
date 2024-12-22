@@ -8,9 +8,9 @@ import java.util.UUID;
 public interface UserDataService {
     User create(User user);
 
-    User get(String id);
+    User get(String id, boolean includeInactiveUsers);
 
-    Search<User> search(String username, Integer limit, String cursor);
+    Search<User> search(String username, Integer limit, String cursor, boolean includeInactiveUsers);
 
-    void update(User user);
+    boolean update(User user);
 }

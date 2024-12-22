@@ -7,6 +7,7 @@ import com.jcosta.tinybank.domain.exceptions.DomainException;
 import com.jcosta.tinybank.domain.exceptions.ExceptionCode;
 import com.jcosta.tinybank.domain.exceptions.InvalidParam;
 import com.jcosta.tinybank.domain.users.User;
+import com.jcosta.tinybank.domain.users.UserStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -24,25 +25,34 @@ public class UsersStorage implements UserDataService {
     @Override
     public User create(User user) {
         UUID id = IdHelper.generate();
-        usersDb.put(id, user);
-        return new User(id.toString(), user.username());
+        User userToCreate =  new User(id.toString(), user.username(), UserStatus.ACTIVE);
+        usersDb.put(id,userToCreate);
+        return userToCreate;
     }
 
     @Override
-    public User get(String id) {
+    public User get(String id, boolean includeInactiveUsers) {
         UUID recordId = IdHelper.generateFromString(id);
 
         if (recordId == null) {
-            throw new BusinessException(
-                    ExceptionCode.NOT_FOUND_EXCEPTION,
-                    String.format("user with id [%s] not fount", id));
+             return null;
         }
 
-        return usersDb.get(recordId);
+        User user =  usersDb.get(recordId);
+
+        if (user == null) {
+            return null;
+        }
+
+        if(!includeInactiveUsers && user.status().equals(UserStatus.INACTIVE)) {
+            return null;
+        }
+
+        return user;
     }
 
     @Override
-    public Search<User> search(String username, Integer limit, String cursor) {
+    public Search<User> search(String username, Integer limit, String cursor, boolean includeInactive) {
         int validLimit;
 
         if (limit == null) {
@@ -72,7 +82,11 @@ public class UsersStorage implements UserDataService {
         List<User> users  = usersDb
                 .entrySet()
                 .stream()
-                .filter(userRecord -> username == null || userRecord.getValue().username().equalsIgnoreCase(username))
+                .filter(userRecord -> {
+                    return username == null ||
+                            (userRecord.getValue().username().equalsIgnoreCase(username) &&
+                                    (includeInactive || userRecord.getValue().status().equals(UserStatus.ACTIVE)));
+                })
                 .skip(parsedCursor)
                 .limit(validLimit)
                 .map(Map.Entry::getValue)
@@ -83,14 +97,15 @@ public class UsersStorage implements UserDataService {
     }
 
     @Override
-    public void update(User user) {
-
+    public boolean update(User user) {
         UUID recordId = IdHelper.generateFromString(user.id());
 
+        // TODO:
         if(recordId == null || !usersDb.containsKey(recordId)) {
-            throw new BusinessException(ExceptionCode.NOT_FOUND_EXCEPTION, String.format("user with id [%s] not fount", user.id()));
+            return false;
         }
 
         usersDb.replace(recordId, user);
+        return true;
     }
 }

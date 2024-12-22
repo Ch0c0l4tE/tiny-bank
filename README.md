@@ -1,22 +1,72 @@
 # tiny-bank
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+## Assumptions
+- Inactive users can be fetched using Get by id method, but they dont appear on normal search
+- All search methods are using cursor pagination instead offset
+- It's only possible to execute transactions within existing accounts - this means that operations to external accounts
+  that our system will be considered invalid, but the transaction resource is not tied to accounts by path to enable
+  the possibility of implementing this introducing the minimum of breaking changes.
+- When we deactivate a user all his accounts are also deactivated
+- Deactivated accounts cant preform any type of transactions
+- HAL (Hypertext Application Language) concept was introduced to all REST endpoints to improve api understanding.
 
-## Running the application in dev mode
 
-You can run your application in dev mode that enables live coding using:
+## Application Design
+- This applications takes benefit of Hexagonal Architecture concept, in order to make the structure following a 
+known architecture pattern and with this improve some the non functional requirements ([article here](https://alistaircockburn.com/Hexagonal%20Budapest%2023-05-18.pdf))
+as maintainability, scalability, flexibility, testability, etc.
+- Brief summary of in what this translates in terms of project structure:
+```
+  src/
+  └── main/
+      ├── java/
+      │   └── com/
+      │       └── joao.costa.tynybank/
+      │           ├── application/
+      │           │   ├── usecases/ # Application service (business logic) - flow/orchestration/inter domain validations
+      │           │   └── port/  # needed contracts to have success executing the usecaes
+      │           ├── domain/ # Models  validation 
+      │           └── adapters/
+      │           │   └── in/  # components that expose business logic/features to the outside 
+      │           │   └── out/  # components that implement port interfaces responsible for accessing outside resources (databases, external services, etc)
+      │           └── config.di/ # Dependency injection config 
+      └── resources/
+            └── application.properties   # Configuration 
+  └── test/ # unit tests
+          
+```
+
+## Docs
+- Open API spec [here](./docs/openapi.yml)
+- Postman Collection [here](./docs/Tiny%20Bank.postman_collection.json)
+- Brief domain [here](./docs/domain.drawio.png)
+
+## TODO
+[] users tests
+[] accounts tests
+[] transactions tests
+[] api spec
+[] epoch milis
+
+## Pre Requirements
+- Java 21 JDK
+- Quarkus 3.17.5
+
+## Running the application 
+### Running the application in dev mode
 
 ```shell script
 ./mvnw quarkus:dev
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+### Running unit tests
 
-## Packaging and running the application
+```shell script
+./mvnw quarkus:test
+```
 
-The application can be packaged using:
+### Packaging and running the application
 
 ```shell script
 ./mvnw package
@@ -35,7 +85,7 @@ If you want to build an _über-jar_, execute the following command:
 
 The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
 
-## Creating a native executable
+### Creating a native executable
 
 You can create a native executable using:
 
@@ -51,31 +101,4 @@ Or, if you don't have GraalVM installed, you can run the native executable build
 
 You can then execute your native executable with: `./target/tiny-bank-1.0.0-SNAPSHOT-runner`
 
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
 
-## Provided Code
-
-### REST
-
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
-
-
-
-
-# Assumptions 
-- Inactive users can be fetched by the Get by id method, but they dont appear on normal search 
-- Search is using cursor pagination instead offset 
-- Its only possible to execute transactions within existing accounts - this means that operations to external accounts 
-that our system will be considered invalid, but the transaction resource is not tied to accounts by path to enable 
-the possibility of implementing this introducing the minimum of breaking changes. 
-
-
-# TODO
-[] users tests
-[] accounts tests
-[] transactions tests
-[] api spec
-[] describe application arch
-[] prereqs to run  

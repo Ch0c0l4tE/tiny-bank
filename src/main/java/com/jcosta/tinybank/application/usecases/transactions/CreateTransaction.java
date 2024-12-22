@@ -54,7 +54,7 @@ public class CreateTransaction {
             if (sourceAccount == null) {
                 throw new BusinessException(
                         ExceptionCode.NOT_FOUND_EXCEPTION,
-                        String.format("source account with id [%s] not fount", transaction.target()));
+                        String.format("source account with id [%s] not fount", transaction.source()));
             }
 
             Account targetAccount = this.accountsDataService.get(transaction.target(), false);

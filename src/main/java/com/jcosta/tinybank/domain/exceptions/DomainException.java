@@ -12,8 +12,16 @@ public class DomainException extends RuntimeException {
         this.invalidParams = invalidParams;
     }
 
-    public DomainException(ExceptionCode code, List<InvalidParam> invalidParamList) {
-        this(code, invalidParamList, null);
+    public DomainException(ExceptionCode code, List<InvalidParam> invalidParams) {
+        this(code, invalidParams, null);
+    }
+
+    public DomainException(ExceptionCode code, InvalidParam invalidParam) {
+        this(code, List.of(invalidParam), null);
+    }
+
+    public DomainException(ExceptionCode code, InvalidParam invalidParam, Throwable cause) {
+        this(code, List.of(invalidParam), cause);
     }
 
     public List<InvalidParam> getInvalidParams() {

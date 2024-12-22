@@ -10,7 +10,7 @@ public interface UserDataService {
 
     User get(String id);
 
-    Search<User> search(String username, int limit, String cursor);
+    Search<User> search(String username, Integer limit, String cursor);
 
     void update(User user);
 }

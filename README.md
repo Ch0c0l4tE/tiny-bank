@@ -65,4 +65,5 @@ Easily start your REST Web Services
 
 
 # Assumptions 
-Inactive users are only visible through direct access to the database. lists and get will return not found
+Inactive users can be fetched by the Get by id method, but they dont appear on normal search 
+Search is using cursor pagination instead offset 

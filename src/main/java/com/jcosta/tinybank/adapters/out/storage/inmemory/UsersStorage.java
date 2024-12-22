@@ -79,21 +79,28 @@ public class UsersStorage implements UserDataService {
             }
         }
 
+        boolean shouldIgnoreUsername = username == null || username.isEmpty();
+
         List<User> users  = usersDb
                 .entrySet()
                 .stream()
                 .filter(userRecord -> {
-                    return username == null ||
-                            (userRecord.getValue().username().equalsIgnoreCase(username) &&
-                                    (includeInactive || userRecord.getValue().status().equals(UserStatus.ACTIVE)));
+                    return (shouldIgnoreUsername || userRecord.getValue().username().equalsIgnoreCase(username)) &&
+                                    (includeInactive || userRecord.getValue().status().equals(UserStatus.ACTIVE));
                 })
                 .skip(parsedCursor)
-                .limit(validLimit)
+                .limit(validLimit+1)
                 .map(Map.Entry::getValue)
                 .toList();
 
-        long nextCursor = parsedCursor + validLimit;
-        return new Search<>(users, encrypt(Long.toString(nextCursor)));
+        String nextCursor = null;
+
+        if (users.size() > validLimit){
+            nextCursor = Long.toString(parsedCursor + validLimit);
+            users = users.subList(0, users.size()-1);
+        }
+
+        return new Search<>(users, encrypt(nextCursor), validLimit);
     }
 
     @Override

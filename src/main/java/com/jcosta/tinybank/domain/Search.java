@@ -6,10 +6,12 @@ public class Search<T> {
 
     private final List<T> items;
     private final String cursor;
+    private final int limit;
 
-    public Search(List<T> items, String cursor) {
+    public Search(List<T> items, String cursor, int limit) {
         this.items = items;
         this.cursor = cursor;
+        this.limit = limit;
     }
 
     public List<T> getItems() {
@@ -18,5 +20,9 @@ public class Search<T> {
 
     public String getCursor() {
         return cursor;
+    }
+
+    public int getLimit() {
+        return limit;
     }
 }

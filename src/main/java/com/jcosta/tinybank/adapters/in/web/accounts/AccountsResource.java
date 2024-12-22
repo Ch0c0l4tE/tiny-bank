@@ -77,7 +77,7 @@ public class AccountsResource {
                             .build().toString(), HttpMethod.GET));
         }
 
-        return new WebResponse<>(account, links);
+        return new WebResponse<>(account, links.size() == 0 ? null : links);
     }
 
     private ListWebResponse<WebResponse<Account>> toListWebResponse(Search<Account> search, URI baseUri, AccountsSearchQuery query) {

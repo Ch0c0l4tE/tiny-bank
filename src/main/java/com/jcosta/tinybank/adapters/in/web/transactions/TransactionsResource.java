@@ -77,7 +77,6 @@ public class TransactionsResource {
     }
 
     private WebResponse<Transaction> toWebResponse(Transaction transaction) {
-        Map<String, Link> links = new HashMap<>();
-        return new WebResponse<>(transaction, links);
+        return new WebResponse<>(transaction, null);
     }
 }

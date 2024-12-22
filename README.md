@@ -74,9 +74,8 @@ the possibility of implementing this introducing the minimum of breaking changes
 
 # TODO
 [] users tests
-[] accounts implementation and tests
-[] transactions implementation and tests
-[]api spec
-[]describe application arch
-[]prereqs to run 
-[] event bus on change user status 
+[] accounts tests
+[] transactions tests
+[] api spec
+[] describe application arch
+[] prereqs to run  

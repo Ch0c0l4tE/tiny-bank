@@ -7,16 +7,41 @@ servers:
 paths:
   /users:
     get:
+      parameters:
+        - in: query
+          name: username
+          schema:
+            type: string
       responses:
         '200':
           description: OK
+          content:
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/SearchUserResult"
         '500':
           description: Internal Server Error
     post:
+      requestBody:
+        content:
+          application/json:
+            schema:            
+              $ref: "#/components/schemas/CreateUserRequest"
       responses:
         '200':
           description: OK
+          content:
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/User"
+
         '400':
+          content:
+            application/json: 
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/ContractErrorResponse"
+                  - $ref: "#/components/schemas/ErrorResponse"
           description: Bad Request
         '409':
           description: Conflict
@@ -24,35 +49,84 @@ paths:
           description: Internal Server Error
   /users/{user-id}:
     patch:
+      requestBody:
+        content:
+          application/json:
+            schema:            
+              $ref: "#/components/schemas/JsonPatch"
+      parameters:
+        - in: path
+          name: user-id
+          schema:
+            type: string
+          required: true
       responses:
         '204':
           description: No Content
-        '304':
-          description: Not Modified
         '400':
+          content:
+            application/json: 
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/ContractErrorResponse"
+                  - $ref: "#/components/schemas/ErrorResponse"
           description: Bad Request
         '500':
           description: Internal Server Error
     get: 
+      parameters:
+        - in: path
+          name: user-id
+          schema:
+            type: string
+          required: true
       responses: 
         '200':
           description: OK
+          content:
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/User"
         '404':
           description: Not Found
         '500':
           description: Internal Server Error
   /accounts:
     get:
+      parameters:
+        - in: query
+          name: ownerId
+          schema:
+            type: string
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchAccountResult"
         '500':
           description: Internal Server Error
     post:
+      requestBody:
+        content:
+          application/json:
+            schema:            
+              $ref: "#/components/schemas/CreateAccountRequest"
       responses:
         '200':
           description: OK
+          content:
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/Account"
         '400':
+          content:
+            application/json: 
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/ContractErrorResponse"
+                  - $ref: "#/components/schemas/ErrorResponse"
           description: Bad Request
         '409':
           description: Conflict
@@ -60,27 +134,197 @@ paths:
           description: Internal Server Error
   /accounts/{account-id}:
     get: 
+      parameters:
+        - in: path
+          name: account-id
+          schema:
+            type: string
+          required: true
       responses: 
         '200':
           description: OK
+          content:
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/Account"
         '404':
           description: Not Found
         '500':
           description: Internal Server Error
   /transactions:
     get: 
+      parameters:
+        - in: query
+          name: accountId
+          schema:
+            type: string
       responses: 
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchTransactionResult"
         '404':
           description: Not Found
         '500':
           description: Internal Server Error
     post: 
+      requestBody:
+        content:
+          application/json:
+            schema:            
+              $ref: "#/components/schemas/CreateTransactionRequest"
       responses: 
         '200':
           description: OK
+          content:
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/Transaction"
         '400':
+          content:
+            application/json: 
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/ContractErrorResponse"
+                  - $ref: "#/components/schemas/ErrorResponse"
           description: Bad Request
         '500':
           description: Internal Server Error
+
+components:
+  schemas:
+    SearchUserResult:
+      type: object
+      properties:
+        embedded:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+      allOf:
+        - $ref: "#/components/schemas/HAL"
+    CreateUserRequest:
+      type: object
+      properties:
+        username: 
+          type: string
+        status: 
+          type: string
+          enum: [ACTIVE,INACTIVE]
+    User:
+      type: object
+      properties:
+        id: 
+          type: string
+      allOf:
+        - $ref: "#/components/schemas/HAL"
+        - $ref: "#/components/schemas/CreateUserRequest"
+    HAL:
+      type: object 
+      properties:
+        _links:
+          type: object
+          example: { 
+            link1: {href: "http://localhost/xpto?limit=1&cursor=DAsd", method: GET},
+            link2: {href: "http://localhost/xpto", method: PATCH}
+          }
+    JsonPatch:
+      type: array
+      items:
+        type: object
+        properties:
+          op: 
+            type: string
+            enum:
+              - replace
+          path:
+            type: string
+            example: /status
+          value: 
+            type: string 
+            example: ACTIVE
+    CreateAccountRequest:
+      type: object
+      properties:
+        ownerId: 
+          type: string
+        balance: 
+          type: integer
+          format: int64
+    Account: 
+      type: object
+      properties:
+        id: 
+          type: string
+      allOf:
+        - $ref: "#/components/schemas/HAL"
+        - $ref: "#/components/schemas/CreateAccountRequest"
+    SearchAccountResult:
+      type: object
+      properties:
+        embedded:
+          type: array
+          items:
+            $ref: "#/components/schemas/Account"
+      allOf:
+        - $ref: "#/components/schemas/HAL"
+    CreateTransactionRequest:
+      type: object
+      properties:
+        operationType:
+          type: string 
+          enum:
+            - "WITHDRAW"
+            - "DEPOSIT"
+            - "TRANSFER"
+        source: 
+          type: string
+          description: source is used in "TRANSFER" and "WITHDRAW" types
+        target: 
+          type: string
+          description: target is used in "DEPOSIT" and "TRANSFER" types
+        amount:
+          type: integer
+          format: int64
+    Transaction: 
+      type: object
+      properties:
+        occurredAt:
+          type: string
+          description: utc dates
+          example: 2024-12-22T23:53:21.107
+      allOf:
+        - $ref: "#/components/schemas/CreateTransactionRequest"
+    SearchTransactionResult:
+      type: object
+      properties:
+        embedded:
+          type: array
+          items:
+            $ref: "#/components/schemas/Transaction"
+      allOf:
+        - $ref: "#/components/schemas/HAL"
+  # Error Responses
+    ErrorResponse: 
+      type: object
+      properties:
+        type:
+          type: string
+        title: 
+          type: string
+    ContractErrorResponse: 
+      type: object
+      properties:
+        type:
+          type: string
+        invalid-params: 
+          type: array
+          items:
+            properties:
+              name: 
+                type: string
+              reason: 
+                type: string
+
+          

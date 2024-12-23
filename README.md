@@ -39,12 +39,8 @@ as maintainability, scalability, flexibility, testability, etc.
 
 ## Docs
 - Open API spec [here](./docs/openapi.yml)
-- Postman Collection [here](./docs/Tiny%20Bank.postman_collection.json)
+- Postman Collection [here](./docs/Tiny%20Bank.postman_collection.json) 
 - Brief domain [here](./docs/domain.drawio.png)
-
-## TODO
-[] api spec
-[] epoch milis
 
 ## Pre Requirements
 - Java 21 JDK

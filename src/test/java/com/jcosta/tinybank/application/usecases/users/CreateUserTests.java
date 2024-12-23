@@ -33,13 +33,13 @@ public class CreateUserTests {
         // Arrange
         String username = "test";
         doReturn(new Search<>(List.of(new User(UUID.randomUUID().toString(), username, UserStatus.ACTIVE)), "0", 100))
-                .when(this.userDataService).search(username, null, null, false);
+                .when(this.userDataService).search(username, null, null, true);
 
         // Act & Assert
         Assertions.assertThrows(
                 BusinessException.class,
                 () -> this.createUser.execute(new CreateUserRequest(username)));
-        verify(this.userDataService).search(username, null, null, false);
+        verify(this.userDataService).search(username, null, null, true);
     }
 
     @Test
@@ -47,7 +47,7 @@ public class CreateUserTests {
         // Arrange
         String username = "test";
         doReturn(new Search<>(List.of(), null, 100))
-                .when(this.userDataService).search(username, null, null, false);
+                .when(this.userDataService).search(username, null, null, true);
 
         User mockedUser = new User(null, username, UserStatus.ACTIVE);
 
@@ -58,7 +58,7 @@ public class CreateUserTests {
 
         // Assert
         Assertions.assertEquals(username, user.username());
-        verify(this.userDataService).search(username, null, null, false);
+        verify(this.userDataService).search(username, null, null, true);
         verify(this.userDataService).create(user);
     }
 }

@@ -4,7 +4,7 @@
 		"name": "Tiny Bank",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "16970637",
-		"_collection_link": "https://orange-flare-900271.postman.co/workspace/Truphone~692e0474-0e4e-4b47-a982-c5a7a8a786ef/collection/16970637-9f812125-a186-4017-b37f-f1ef6166817f?action=share&source=collection_link&creator=16970637"
+		"_collection_link": "https://orange-flare-900271.postman.co/workspace/tiny-bank~74692e00-0fc1-44fd-bea0-e3cfb5d34c7c/collection/16970637-9f812125-a186-4017-b37f-f1ef6166817f?action=share&source=collection_link&creator=16970637"
 	},
 	"item": [
 		{
@@ -17,7 +17,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"test2\"\r\n}",
+							"raw": "{\r\n    \"username\": \"test1\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -42,7 +42,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/users?limit=3&username",
+							"raw": "http://localhost:8080/users?limit=3&username=test2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -58,7 +58,7 @@
 								},
 								{
 									"key": "username",
-									"value": null
+									"value": "test2"
 								}
 							]
 						}
@@ -71,13 +71,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/users/3f58ca3f-980f-4c90-a14c-ae7887d14685",
+							"raw": "{{baseUrl}}/users/27704e6e-ce29-4842-ba11-0fa1ced31094",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"users",
-								"3f58ca3f-980f-4c90-a14c-ae7887d14685"
+								"27704e6e-ce29-4842-ba11-0fa1ced31094"
 							]
 						}
 					},
@@ -122,7 +122,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"ownerId\": \"b9e21822-e198-4a01-9b52-974d9a3c8209\",\r\n    \"balance\": 100\r\n}",
+							"raw": "{\r\n    \"ownerId\": \"27704e6e-ce29-4842-ba11-0fa1ced31094\",\r\n    \"balance\": 100.1\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -225,7 +225,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"operationType\": \"WITHDRAW\",\r\n    \"source\": \"a6e484c9-0e4f-4783-8543-41a351baff82\",\r\n    \"amount\": 30\r\n}",
+							"raw": "{\r\n    \"operationType\": \"WITHDRAW\",\r\n    \"source\": \"b2b56360-7c0b-40d1-ac21-c8c8c6ce38b9\",\r\n    \"amount\": 30\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -319,6 +319,13 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
 		}
 	]
 }

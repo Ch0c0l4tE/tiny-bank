@@ -116,6 +116,6 @@ public class PatchUserTest {
         });
 
         assertEquals(ExceptionCode.NOT_FOUND_EXCEPTION, exception.getCode());
-        assertEquals("user with id [1] not fount", exception.getMessage());
+        assertEquals("user with id ["+mockUser.id()+"] not fount", exception.getMessage());
     }
 }
